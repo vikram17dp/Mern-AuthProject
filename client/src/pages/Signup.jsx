@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link , useNavigate} from "react-router-dom";
 
 export default function Signup() {
   const [formdata,setFormdata] = useState({});
   const [error,setError] = useState(false);
   const [loading,setLoading] = useState(false);
+  const navigate = useNavigate();
   const handleChange= (e)=>{
     setFormdata({...formdata,[e.target.id]:e.target.value});
   };
@@ -25,6 +26,7 @@ export default function Signup() {
         setError(true)
         return;
       }
+      navigate('/signin')
       setError(false)
     } catch (error) {
           setLoading(false);
@@ -68,7 +70,7 @@ export default function Signup() {
       <div className="gap-5 text-[18px] flex mt-3">
         <p className="text-black tracking-tighter">Have an account</p>
         <Link to="/signin">
-          <span className="text-blue-700 cursor-pointer">Sign-in</span>
+          <span className="text-blue-700 cursor-pointer">Signin</span>
         </Link>
       
       </div>
