@@ -1,18 +1,20 @@
 import React, { useState } from "react";
-import { Link,useNavigate } from "react-router-dom";
+import { Link,useNavigate,} from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { signInFailure, signInStart, signInSuccess } from "../redux/user/userSlice";
 
 export default function Signin() {
   const [formdata,setFormdata] = useState({});
-  const [error,setError] = useState(false);
-  const [loading,setLoading] = useState(false);
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.user);
   const handleChange= (e)=>{
     setFormdata({...formdata,[e.target.id]:e.target.value});
   };
   const handleSubmit = async (e)=>{
     e.preventDefault();
-    setLoading(true)
-    setError(null)
+    dispatch(signInStart())
     try {
       const res = await fetch('/api/auth/signin',{
         method:'POST',
@@ -22,16 +24,16 @@ export default function Signin() {
         body:JSON.stringify(formdata),
       });
       const data = await res.json();
-      setLoading(false)
-      if(data.success == false){
-        setError(true)
+     
+      if(data.success === false){
+        dispatch(signInFailure(data.error));
         return;
       }
+      dispatch(signInSuccess(data))
       navigate('/')
-      setError(false)
+      
     } catch (error) {
-          setLoading(false);
-          setError(true);
+          dispatch(signInFailure(error.message));
     }
     
   } 
@@ -47,7 +49,7 @@ export default function Signin() {
           placeholder="Email"
           id="email"
           onChange={handleChange}
-          value={formdata.email}
+          value={formdata.email || ""}
         />
         <input
           className="bg-slate-300 rounded-lg px-4 py-3 outline-none"
@@ -55,7 +57,7 @@ export default function Signin() {
           placeholder="Password"
           id="password"
           onChange ={handleChange}
-          value={formdata.password}
+          value={formdata.password || ""}
         />
         <button  type="submit" className="bg-slate-700 text-white uppercase p-4 rounded-md hover:opacity-85 disabled:opacity-100">
           {loading?'loading...':'Sign-in'}
@@ -71,7 +73,10 @@ export default function Signin() {
         </Link>
       
       </div>
-      <p className="text-red-700 mt-2">{error ? "Something went wrong!" : ""}</p>
+      <p className="text-red-700 mt-2">
+      {error ? error:""}
+      
+      </p>
     </div>
   );
 }
