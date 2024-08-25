@@ -1,6 +1,7 @@
 import express from 'express'
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import userRoutes from './routes/user.route.js'
 import authRoutes from './routes/auth.route.js'
 import cookieParser from 'cookie-parser';
@@ -15,6 +16,10 @@ mongoose.connect(process.env.MONGO).then(()=>{
 .catch((err)=>{
     console.log(err);
 })
+app.use(cors({
+    origin: 'http://localhost:3000', // Update with your frontend domain
+    credentials: true, // Allow credentials (cookies) to be sent
+}));
 
 app.listen(3000,(req,res)=>{
     console.log("server listening on port 3000!")
