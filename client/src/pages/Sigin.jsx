@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link,useNavigate,} from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess } from "../redux/user/userSlice";
@@ -9,14 +9,21 @@ export default function Signin() {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.user);
+  const { loading, error,currentUser } = useSelector((state) => state.user);
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/profile'); // Redirect to profile page if user is already signed in
+    }
+  }, [currentUser, navigate]);
+  
   const handleChange= (e)=>{
     setFormdata({...formdata,[e.target.id]:e.target.value});
   };
+  
   const handleSubmit = async (e)=>{
     e.preventDefault();
-    dispatch(signInStart())
     try {
+      dispatch(signInStart())
       const res = await fetch('/api/auth/signin',{
         method:'POST',
         headers:{
@@ -31,7 +38,7 @@ export default function Signin() {
         return;
       }
       dispatch(signInSuccess(data))
-      navigate('/')
+      navigate('/profile')
       
     } catch (error) {
           dispatch(signInFailure(error.message));
@@ -61,7 +68,7 @@ export default function Signin() {
           value={formdata.password || ""}
         />
         <button  type="submit" className="bg-slate-700 text-white uppercase p-4 rounded-md hover:opacity-85 disabled:opacity-100">
-          {loading?'loading...':'Sign-in'}
+          {loading?'loading...':'Signin'}
         </button>
         <OAuth/>
       </form>
