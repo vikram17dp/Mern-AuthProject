@@ -41,6 +41,7 @@ export default function Signin() {
       navigate('/profile')
       
     } catch (error) {
+      
           dispatch(signInFailure(error.message));
     }
     
