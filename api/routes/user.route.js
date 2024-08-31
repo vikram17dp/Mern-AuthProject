@@ -5,7 +5,7 @@ import { VerifyToken } from '../utils/VerfiyToken.js';
 const router = express.Router();
 
 router.get('/',test);
-router.put('/update/:id',VerifyToken,updateUser)
+router.post('/update/:id',VerifyToken,updateUser)
 
 
 

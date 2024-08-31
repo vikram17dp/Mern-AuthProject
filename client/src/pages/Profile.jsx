@@ -51,7 +51,7 @@ const handleSubmit =async (e)=>{
     try {
       dispatch(updateUserStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`,{
-        method:'PUT',
+        method:'POST',
         headers:{
          'Content-Type': 'application/json',
         },
