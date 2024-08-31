@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useRef } from "react";
 import { ref, getStorage, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
-import {app} from '../firebase'
+import app from '../firebase.js'
 
 export default function Profile() {
   const fileref = useRef(null);
@@ -52,7 +52,17 @@ const handleFileUpload = async (image)=>{
           alt=""
           onClick={() => fileref.current.click()}
         />
-        
+          <p className='text-sm self-center'>
+          {imageError ? (
+            <span className='text-red-700'>Error uploading image (file size must be less than 2 MB)</span>
+          ) : imagePercent > 0 && imagePercent < 100 ? (
+            <span className='text-slate-700'>{`Uploading: ${imagePercent} %`}</span>
+          ) : imagePercent === 100 ? (
+            <span className='text-green-700'>Image uploaded successfully</span>
+          ) : (
+            ''
+          )}
+        </p>
         <input
           defaultValue={currentUser.username}
           type="text"
