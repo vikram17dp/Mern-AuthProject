@@ -12,7 +12,7 @@ export default function Signin() {
   const { loading, error,currentUser } = useSelector((state) => state.user);
   useEffect(() => {
     if (currentUser) {
-      navigate('/profile'); // Redirect to profile page if user is already signed in
+      navigate('/'); // Redirect to profile page if user is already signed in
     }
   }, [currentUser, navigate]);
   
@@ -38,7 +38,7 @@ export default function Signin() {
         return;
       }
       dispatch(signInSuccess(data))
-      navigate('/')
+      navigate('/home')
       
     } catch (error) {
       
