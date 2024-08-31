@@ -11,6 +11,7 @@ function OAuth() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const handleGoogleClick = async () => {
+    
     if (isAuthenticating) return; // Prevent multiple popups
 
     setIsAuthenticating(true); // Set loading state
