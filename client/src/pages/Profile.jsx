@@ -17,7 +17,7 @@ export default function Profile() {
     if(image){
       handleFileUpload(image);
     }
-  },[image])
+  },[image]);
 const handleFileUpload = async (image)=>{
       const storage = getStorage(app);
       const filename = new Date().getTime() + image.name;
@@ -34,7 +34,7 @@ const handleFileUpload = async (image)=>{
       },
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
-          setFormData({ ...formData, profilePicture: downloadURL })
+          setFormData({ ...formData, profileImage: downloadURL })
         );
       }
     )
@@ -47,8 +47,8 @@ const handleFileUpload = async (image)=>{
           onChange={(e)=>setImage(e.target.files[0])}
         />
         <img
-          src={currentUser.profileImage}
-          className="h-24 w-24 self-center cursor-pointer "
+          src={ formData.profileImage||currentUser.profileImage}
+          className="h-24 w-24 self-center rounded-[50%] cursor-pointer "
           alt=""
           onClick={() => fileref.current.click()}
         />
