@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useRef } from "react";
 import { ref, getStorage, uploadBytesResumable, getDownloadURL } from 'firebase/storage'
 import app from '../firebase.js'
+import { updateUserStart,updateUserSuccess,updateUserFailure } from "../redux/user/userSlice";
 
 export default function Profile() {
   const fileref = useRef(null);
@@ -10,8 +11,10 @@ export default function Profile() {
   const [imagePercent, setImagePercent] = useState(0);
   const [imageError, setImageError] = useState(false);
   const [formData, setFormData] = useState({});
-  const { currentUser } = useSelector((state) => state.user);
-  console.log(formData);
+  const { currentUser ,loading,error} = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const [UpdateSuccess,setUpdateSuccess] = useState(false);
+
   
   useEffect(()=>{
     if(image){
@@ -32,17 +35,44 @@ const handleFileUpload = async (image)=>{
       (error)=>{
         setImageError(true);
       },
-      () => {
+     () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
           setFormData({ ...formData, profileImage: downloadURL })
+
         );
       }
     )
 }
+const handleChanges = (e)=>{
+    setFormData({...formData,[e.target.id]:e.target.value});
+}
+const handleSubmit =async (e)=>{
+    e.preventDefault();
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`,{
+        method:'PUT',
+        headers:{
+         'Content-Type': 'application/json',
+        },
+        body:JSON.stringify(formData)
+      })
+      const data = await res.json();
+      if(data.success === false){
+        dispatch(updateUserFailure(data));
+        setUpdateSuccess(false);
+      }else {
+        dispatch(updateUserSuccess(data)); 
+        setUpdateSuccess(true);
+    }
+    } catch (error) {
+      dispatch(updateUserFailure(error))
+    }
+}
   return (
     <div className="p-3 max-w-lg mx-auto gap-4">
       <h1 className="text-3xl text-center my-7 font-semibold">Profile</h1>
-      <form action="" className="flex flex-col">
+      <form action="" className="flex flex-col" onSubmit={handleSubmit}>
         <input type="file" ref={fileref} hidden accept="image/*"
           onChange={(e)=>setImage(e.target.files[0])}
         />
@@ -50,6 +80,7 @@ const handleFileUpload = async (image)=>{
           src={ formData.profileImage||currentUser.profileImage}
           className="h-24 w-24 self-center rounded-[50%] cursor-pointer "
           alt=""
+   
           onClick={() => fileref.current.click()}
         />
           <p className='text-sm self-center'>
@@ -68,6 +99,7 @@ const handleFileUpload = async (image)=>{
           type="text"
           placeholder="Username"
           id="username"
+          onChange={handleChanges}
           className="p-3 bg-slate-300  mt-3 rounded-lg cursor-pointer"
         />
         <input
@@ -75,22 +107,26 @@ const handleFileUpload = async (image)=>{
           type="email"
           placeholder="email"
           id="email"
+          onChange={handleChanges}
           className="bg-slate-300 p-3 mt-3 rounded-lg"
         />
         <input
           type="password"
           placeholder="password"
           id="password"
+          onChange={handleChanges}
           className="bg-slate-300 p-3 rounded-lg mt-3"
         />
         <button className="bg-slate-700 text-white uppercase mt-3 p-3 rounded-lg opacity-95 hover:opacity-80">
-          Update
+        {loading ? 'Loading...':'Update'}
         </button>
+      </form>
         <div className="justify-between flex mt-3">
           <span className="text-red-700 cursor-pointer">Delete Account</span>
           <span className="text-red-700 cursor-pointer">Sign Out</span>
         </div>
-      </form>
+        <p className="text-red-700 mt-5">{error && 'something went wrong!'}</p>
+        <p className="text-green-700 mt-5">{UpdateSuccess && 'User Updated Successfully!'}</p>
     </div>
   );
 }

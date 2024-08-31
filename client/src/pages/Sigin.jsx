@@ -38,7 +38,7 @@ export default function Signin() {
         return;
       }
       dispatch(signInSuccess(data))
-      navigate('/profile')
+      navigate('/')
       
     } catch (error) {
       

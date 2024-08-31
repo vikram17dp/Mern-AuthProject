@@ -33,7 +33,8 @@ function OAuth() {
       const data = await res.json();
       console.log(data);
       dispatch(signInSuccess(data));
-      navigate('/'); // Corrected the navigation
+      
+      navigate('/'); 
     } catch (error) {
       console.log('Could not login with Google', error);
     }
